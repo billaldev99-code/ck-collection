@@ -1,0 +1,27 @@
+{
+  "name": "c-k-collection",
+  "version": "1.0.0",
+  "private": true,
+  "description": "C-K-Collection — boutique e-commerce & vitrine mode feminine",
+  "workspaces": [
+    "web",
+    "server"
+  ],
+  "scripts": {
+    "install:all": "npm install --prefix web && npm install --prefix server",
+    "dev:web": "npm run dev --prefix web",
+    "dev:server": "npm run dev --prefix server",
+    "build:web": "npm run build --prefix web",
+    "db:generate": "npx prisma generate --schema=db/prisma/schema.prisma",
+    "db:migrate": "npx prisma migrate dev --schema=db/prisma/schema.prisma",
+    "db:deploy": "npx prisma migrate deploy --schema=db/prisma/schema.prisma",
+    "db:seed": "node server/seed.mjs",
+    "db:studio": "npx prisma studio --schema=db/prisma/schema.prisma"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0"
+  }
+}

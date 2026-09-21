@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://c-k-collection.vercel.app/sitemap.xml
