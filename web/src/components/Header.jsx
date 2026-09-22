@@ -24,8 +24,8 @@ export default function Header() {
           </nav>
           <div className="icons">
             <button className="icon-btn" onClick={() => nav("/shop")} aria-label="Recherche">⌕</button>
-            <button className="icon-btn" onClick={() => nav(user ? "/account" : "/login")} aria-label="Compte">♡</button>
-            <button className="icon-btn" onClick={() => nav("/cart")} aria-label="Panier">🛍{count > 0 && <span className="cart-count">{count}</span>}</button>
+            <button className="icon-btn" onClick={() => nav(user ? "/account" : "/login")} aria-label="Compte">👤</button>
+            <button className="icon-btn" onClick={() => nav("/cart")} aria-label="Panier">🛒{count > 0 && <span className="cart-count">{count}</span>}</button>
           </div>
         </div>
       </header>

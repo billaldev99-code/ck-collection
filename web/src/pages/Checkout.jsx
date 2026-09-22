@@ -3,16 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { api, fmtDA } from "../services/api";
 
-const WILAYAS = ["Alger", "Oran", "Constantine", "Annaba", "Blida", "Sétif", "Tlemcen", "Béjaïa", "Autre"];
+import { WILAYAS } from "../data/algeria";
 
 export default function Checkout() {
   const { items, subtotal, clear } = useCart();
   const nav = useNavigate();
-  const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", wilaya: "Alger", commune: "", address: "", notes: "" });
+  const [form, setForm] = useState({ firstName: "", lastName: "", phone: "", email: "", wilaya: "16 - Alger", commune: "", address: "", notes: "" });
   const [done, setDone] = useState(null);
   const [err, setErr] = useState("");
 
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const pickWilaya = (e) => setForm({ ...form, wilaya: e.target.value, commune: "" });
+  const communes = (WILAYAS.find((w) => `${w.code} - ${w.name}` === form.wilaya) || WILAYAS[15]).communes;
 
   async function submit(e) {
     e.preventDefault();
@@ -37,9 +39,13 @@ export default function Checkout() {
             <input className="input" placeholder="Prénom" value={form.firstName} onChange={set("firstName")} required />
           </div>
           <input className="input" placeholder="Téléphone (ex: 0550...)" value={form.phone} onChange={set("phone")} required />
+          <input className="input" type="email" placeholder="Email (optionnel)" value={form.email} onChange={set("email")} />
           <div style={{ display: "flex", gap: ".6rem" }}>
-            <select className="input" value={form.wilaya} onChange={set("wilaya")}>{WILAYAS.map((w) => <option key={w}>{w}</option>)}</select>
-            <input className="input" placeholder="Commune" value={form.commune} onChange={set("commune")} required />
+            <select className="input" value={form.wilaya} onChange={pickWilaya} required>{WILAYAS.map((w) => <option key={w.code} value={`${w.code} - ${w.name}`}>{String(w.code).padStart(2, "0")} - {w.name}</option>)}</select>
+            <select className="input" value={form.commune} onChange={set("commune")} required>
+              <option value="">Commune...</option>
+              {communes.map((c) => <option key={c}>{c}</option>)}
+            </select>
           </div>
           <input className="input" placeholder="Adresse complète" value={form.address} onChange={set("address")} required />
           <textarea className="input" placeholder="Infos complémentaires (optionnel)" value={form.notes} onChange={set("notes")} rows="3" />

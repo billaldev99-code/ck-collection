@@ -115,6 +115,7 @@ model Order {
   firstName    String
   lastName     String
   phone        String
+  email        String?
   wilaya       String
   commune      String
   address      String

@@ -32,9 +32,9 @@ async function main() {
   }
   const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD || "Admin123!", 10);
   await prisma.user.upsert({
-    where: { email: process.env.ADMIN_EMAIL || "admin@c-k-collection.dz" },
+    where: { email: process.env.ADMIN_EMAIL || "billaldev99@gmail.com" },
     update: { role: "SUPER_ADMIN", passwordHash: hash },
-    create: { email: process.env.ADMIN_EMAIL || "admin@c-k-collection.dz", phone: "0550000000", firstName: "Admin", lastName: "CK", passwordHash: hash, role: "SUPER_ADMIN" },
+    create: { email: process.env.ADMIN_EMAIL || "billaldev99@gmail.com", phone: "0791592880", firstName: "Billal", lastName: "Admin", passwordHash: hash, role: "SUPER_ADMIN" },
   });
   for (const [name, cat, price, isNew, img] of PRODUCTS) {
     const category = await prisma.category.findUnique({ where: { slug: slug(cat) } });
@@ -46,7 +46,7 @@ async function main() {
         description: `${name} — pièce C-K-Collection, coupe féminine et tissu de qualité.`,
         categoryId: category?.id,
         images: { create: [{ url: img, alt: name }] },
-        variants: { create: [{ size: "M", stock: 10 }, { size: "L", stock: 10 }] },
+        variants: { create: ["XS", "S", "M", "L", "XL", "XXL"].map((size) => ({ size, stock: 10 })) },
       },
     });
   }

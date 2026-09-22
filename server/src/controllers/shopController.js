@@ -1,5 +1,6 @@
 import { prisma } from "../config/prisma.js";
 import { slugify, nextOrderNumber } from "../utils/helpers.js";
+import { sendOrderReceived, sendOrderStatusEmail, sendAdminContactNotification } from "../utils/mailer.js";
 
 export async function listCategories(_req, res, next) {
   try {
@@ -61,7 +62,7 @@ export async function createOrder(req, res, next) {
     const total = subtotal + shippingFee;
     const order = await prisma.order.create({
       data: {
-        orderNumber: nextOrderNumber(), ...b, items: undefined,
+        orderNumber: nextOrderNumber(), ...b, email: b.email?.trim() || null, items: undefined,
         subtotal, shippingFee, total,
         userId: req.user?.id || null,
         items: { create: lines },
@@ -69,6 +70,8 @@ export async function createOrder(req, res, next) {
       include: { items: true },
     });
     res.status(201).json({ order });
+    // Email de confirmation non-bloquant (si SMTP configuré + email renseigné)
+    sendOrderReceived(order).catch(() => {});
   } catch (e) { next(e); }
 }
 
@@ -100,8 +103,26 @@ export async function getOrder(req, res, next) {
 
 export async function setOrderStatus(req, res, next) {
   try {
-    const order = await prisma.order.update({ where: { id: req.params.id }, data: { status: req.validated.body.status }, include: { items: true } });
+    const existing = await prisma.order.findUnique({
+      where: { id: req.params.id },
+      select: { status: true },
+    });
+    if (!existing) return res.status(404).json({ message: "Commande introuvable" });
+
+    const newStatus = req.validated.body.status;
+    const order = await prisma.order.update({
+      where: { id: req.params.id },
+      data: { status: newStatus },
+      include: { items: true },
+    });
     res.json({ order });
+
+    // Notification client par email si le statut a changé (non bloquant)
+    if (existing.status !== newStatus) {
+      sendOrderStatusEmail(order, newStatus).catch((err) => {
+        console.error("[mail] Échec notification statut:", err.message);
+      });
+    }
   } catch (e) { next(e); }
 }
 
@@ -139,6 +160,7 @@ export async function createContact(req, res, next) {
   try {
     const msg = await prisma.contactMessage.create({ data: req.validated.body });
     res.status(201).json({ message: "Message envoyé, merci !", id: msg.id });
+    sendAdminContactNotification(msg).catch((e) => console.error("[mail] contact notif err:", e.message));
   } catch (e) { next(e); }
 }
 
@@ -146,5 +168,12 @@ export async function listContacts(_req, res, next) {
   try {
     const items = await prisma.contactMessage.findMany({ orderBy: { createdAt: "desc" }, take: 100 });
     res.json({ items });
+  } catch (e) { next(e); }
+}
+
+export async function deleteContact(req, res, next) {
+  try {
+    await prisma.contactMessage.delete({ where: { id: req.params.id } });
+    res.json({ message: "Message supprimé" });
   } catch (e) { next(e); }
 }

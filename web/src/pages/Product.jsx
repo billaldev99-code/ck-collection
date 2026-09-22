@@ -35,7 +35,7 @@ export default function Product() {
           <p style={{ color: "#5b4d49" }}>{p.description || "Pièce élégante C-K-Collection, coupe soignée et tissu doux."}</p>
           {p.variants?.length > 0 && (
             <div><strong>Taille</strong><div style={{ display: "flex", gap: ".5rem", margin: ".5rem 0" }}>
-              {[...new Set(p.variants.map((v) => v.size).filter(Boolean))].map((s) => (
+              {[...new Set(p.variants.map((v) => v.size).filter(Boolean))].sort((a, b) => ["XS", "S", "M", "L", "XL", "XXL"].indexOf(a) - ["XS", "S", "M", "L", "XL", "XXL"].indexOf(b)).map((s) => (
                 <button key={s} className={`btn ${size === s ? "btn-dark" : "btn-ghost"}`} onClick={() => setSize(s)}>{s}</button>
               ))}
             </div></div>
@@ -44,7 +44,7 @@ export default function Product() {
             <input className="input" type="number" min="1" max="20" value={qty} onChange={(e) => setQty(Number(e.target.value))} style={{ maxWidth: 90 }} />
             <button className="btn btn-rose" style={{ flex: 1 }} onClick={() => add(p, qty, size)}>Ajouter au panier 🛍</button>
           </div>
-          <p style={{ fontSize: ".9rem", color: "var(--muted)" }}>✓ Paiement à la livraison · ✓ Livraison 58 wilayas · ✓ {p.stock > 0 ? "En stock" : "Stock limité"}</p>
+          <p style={{ fontSize: ".9rem", color: "var(--muted)" }}>✓ Paiement à la livraison · ✓ Livraison 68 wilayas · ✓ {p.stock > 0 ? "En stock" : "Stock limité"}</p>
         </div>
       </div>
       <h2 style={{ marginTop: "3rem" }}>Vous aimerez aussi</h2>

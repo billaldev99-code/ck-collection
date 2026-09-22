@@ -13,6 +13,7 @@ export default function Admin() {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
   const [cats, setCats] = useState([]);
+  const [contacts, setContacts] = useState([]);
   const [form, setForm] = useState({ name: "", price: "", oldPrice: "", stock: 0, categoryId: "", description: "", image: "", isNew: true, isActive: true });
 
   useEffect(() => { if (!loading && !isAdmin) nav("/login"); }, [loading, isAdmin, nav]);
@@ -22,7 +23,10 @@ export default function Admin() {
     api.admin.orders("?limit=50").then((d) => setOrders(d.items)).catch(() => {});
     api.products("?limit=50&active=").then((d) => setProducts(d.items)).catch(() => {});
     api.categories().then((d) => setCats(d.items)).catch(() => {});
+    api.admin.contacts().then((d) => setContacts(d.items || [])).catch(() => {});
   }, [isAdmin]);
+
+  const loadContacts = () => api.admin.contacts().then((d) => setContacts(d.items || [])).catch(() => {});
 
   if (loading) return <div className="container section">Chargement...</div>;
   if (!isAdmin) return null;
@@ -34,7 +38,7 @@ export default function Admin() {
       price: Math.round(Number(form.price) * 100), oldPrice: form.oldPrice ? Math.round(Number(form.oldPrice) * 100) : null,
       stock: Number(form.stock), categoryId: form.categoryId || null,
       isNew: !!form.isNew, isActive: !!form.isActive, isPromo: !!form.oldPrice,
-      images: form.image ? [{ url: form.image }] : [], variants: [{ size: "M", stock: Number(form.stock) }],
+      images: form.image ? [{ url: form.image }] : [], variants: ["XS", "S", "M", "L", "XL", "XXL"].map((size) => ({ size, stock: Number(form.stock) })),
     };
     await api.admin.createProduct(body);
     const d = await api.products("?limit=50&active=");
@@ -47,7 +51,7 @@ export default function Admin() {
       <h1>Admin ♥</h1>
       <div className="admin-layout" style={{ marginTop: "1rem" }}>
         <aside className="admin-side" style={{ display: "flex", gap: ".5rem", flexWrap: "wrap" }}>
-          {[["stats", "Stats"], ["orders", "Commandes"], ["products", "Produits"]].map(([k, l]) => (
+          {[["stats", "Stats"], ["orders", "Commandes"], ["products", "Produits"], ["contacts", `Messages (${contacts.length})`]].map(([k, l]) => (
             <button key={k} className={`btn ${tab === k ? "btn-dark" : "btn-ghost"}`} onClick={() => setTab(k)}>{l}</button>
           ))}
           <Link to="/" className="btn btn-ghost">Voir le site</Link>
@@ -110,6 +114,53 @@ export default function Admin() {
                 </table>
               </div>
             </>
+          )}
+          {tab === "contacts" && (
+            <div style={{ display: "grid", gap: "1rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <h2>Messages reçus ({contacts.length})</h2>
+                <button className="btn btn-ghost" onClick={loadContacts}>Actualiser 🔄</button>
+              </div>
+              {contacts.length === 0 ? (
+                <div className="card" style={{ padding: "2rem", textAlign: "center", color: "var(--muted)" }}>
+                  Aucun message reçu pour le moment.
+                </div>
+              ) : (
+                contacts.map((c) => (
+                  <div key={c.id} className="card" style={{ padding: "1.2rem", display: "grid", gap: ".6rem" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", flexWrap: "wrap", gap: ".5rem" }}>
+                      <div>
+                        <strong style={{ fontSize: "1.05rem" }}>{c.name}</strong>
+                        {c.phone && (
+                          <div style={{ marginTop: ".3rem" }}>
+                            📞 <a href={`tel:${c.phone}`} style={{ color: "var(--rose-deep)", fontWeight: 600 }}>{c.phone}</a>
+                            {" · "}
+                            <a href={`https://wa.me/${c.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" style={{ color: "var(--rose-deep)", fontSize: ".85rem" }}>Ouvrir WhatsApp</a>
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                        <small style={{ color: "var(--muted)" }}>{new Date(c.createdAt).toLocaleString("fr-FR")}</small>
+                        <button
+                          className="btn btn-ghost"
+                          style={{ padding: ".3rem .7rem", fontSize: ".8rem", color: "crimson", borderColor: "#fdd" }}
+                          onClick={async () => {
+                            if (!window.confirm("Supprimer ce message ?")) return;
+                            await api.admin.deleteContact(c.id);
+                            setContacts((prev) => prev.filter((x) => x.id !== c.id));
+                          }}
+                        >
+                          Supprimer
+                        </button>
+                      </div>
+                    </div>
+                    <div style={{ background: "var(--cream)", padding: "1rem", borderRadius: "10px", whiteSpace: "pre-wrap", color: "var(--ink)", border: "1px solid var(--line)" }}>
+                      {c.message}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           )}
         </div>
       </div>

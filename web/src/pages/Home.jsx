@@ -53,9 +53,9 @@ export default function Home() {
 
       <section className="section" style={{ textAlign: "center", background: "#fff", border: "1px solid var(--line)", borderRadius: 24, padding: "3rem 1.5rem", marginTop: "3rem" }}>
         <p className="eyebrow">Instagram</p>
-        <h2>Suivez @c.k.collection ♥</h2>
+        <h2>Suivez @c_k.collection__ ♥</h2>
         <p style={{ color: "var(--muted)" }}>Looks, nouveautés & coulisses — rejoignez la communauté.</p>
-        <a className="btn btn-rose" href={import.meta.env.VITE_INSTAGRAM_URL || "https://instagram.com"} target="_blank" rel="noreferrer">Suivre sur Instagram</a>
+        <a className="btn btn-rose" href={import.meta.env.VITE_INSTAGRAM_URL || "https://www.instagram.com/c_k.collection__/"} target="_blank" rel="noreferrer">Suivre sur Instagram</a>
       </section>
     </div>
   );

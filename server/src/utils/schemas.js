@@ -57,6 +57,7 @@ export const orderSchema = z.object({
     firstName: z.string().min(2).max(60),
     lastName: z.string().min(2).max(60),
     phone: z.string().min(9).max(20),
+    email: z.string().email().max(120).optional().or(z.literal("")),
     wilaya: z.string().min(1),
     commune: z.string().min(1),
     address: z.string().min(3),

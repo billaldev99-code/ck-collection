@@ -34,6 +34,8 @@ export const api = {
     deleteProduct: (id) => req(`/products/${id}`, { method: "DELETE" }),
     createCategory: (b) => req(`/categories`, { method: "POST", body: JSON.stringify(b) }),
     users: () => req(`/users`),
+    contacts: () => req(`/contacts`),
+    deleteContact: (id) => req(`/contacts/${id}`, { method: "DELETE" }),
   },
 };
 

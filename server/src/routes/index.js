@@ -46,5 +46,6 @@ r.delete("/orders/:id", ...admin, S.deleteOrder);
 r.get("/stats", ...admin, S.stats);
 r.get("/users", ...admin, S.listUsers);
 r.get("/contacts", ...admin, S.listContacts);
+r.delete("/contacts/:id", ...admin, S.deleteContact);
 
 export default r;
