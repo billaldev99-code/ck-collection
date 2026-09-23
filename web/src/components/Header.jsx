@@ -24,7 +24,13 @@ export default function Header() {
           </nav>
           <div className="icons">
             <button className="icon-btn" onClick={() => nav("/shop")} aria-label="Recherche">⌕</button>
-            <button className="icon-btn" onClick={() => nav(user ? "/account" : "/login")} aria-label="Compte">👤</button>
+            {user ? (
+              <button className="icon-btn" onClick={() => { logout(); nav("/"); }} aria-label="Déconnexion" title="Déconnexion">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
+              </button>
+            ) : (
+              <button className="icon-btn" onClick={() => nav("/login")} aria-label="Compte" title="Se connecter">👤</button>
+            )}
             <button className="icon-btn" onClick={() => nav("/cart")} aria-label="Panier">🛒{count > 0 && <span className="cart-count">{count}</span>}</button>
           </div>
         </div>
@@ -37,7 +43,7 @@ export default function Header() {
               <Link key={to + l} to={to} onClick={() => setOpen(false)}>{l}</Link>
             ))}
             {isAdmin && <Link to="/admin" onClick={() => setOpen(false)}>Admin</Link>}
-            {user ? <button className="btn btn-ghost" onClick={() => { logout(); setOpen(false); }}>Déconnexion</button>
+            {user ? <button className="btn btn-ghost" onClick={() => { logout(); setOpen(false); nav("/"); }}>Déconnexion</button>
               : <Link className="btn btn-dark" to="/login" onClick={() => setOpen(false)}>Se connecter</Link>}
           </div>
         </div>
